@@ -1,0 +1,135 @@
+#version 330 core
+
+// Interpolated values from the vertex shaders
+in vec2 UV;
+in vec3 Position_worldspace;
+in vec3 Normal_cameraspace;
+in vec3 EyeDirection_cameraspace;
+in vec4 BubbleCol;
+///////////////////////////////////////// Sun Light
+
+in vec3 LightDirection_cameraspace;
+
+///////////////////////////////////////// Player Light
+
+in vec3 PlayerLightDir_cameraspace;
+
+///////////////////////////////////////// Bubbles Light
+
+in vec3 BubblesLightDir_cameraspace[15];
+in float BubbleLightPower[15];
+
+///////////////////////////////////////
+
+// Ouput data
+out vec3 color;
+
+// Values that stay constant for the whole mesh.
+
+
+uniform vec3 col;
+uniform int isInstanced;
+
+///////////////////////////////////////// Sun Light
+
+uniform vec3 LightPosition_worldspace;
+
+///////////////////////////////////////// Player Light
+
+uniform vec3 PlayerLightPos_worldspace;
+uniform vec3 PlayerLightCol;
+
+///////////////////////////////////////// Bubbles Light
+
+uniform int NumberOfLight;
+uniform vec3 BubblesLightPos_worldspace[15];
+uniform vec3 BubblesLightColor[15];
+//uniform double BubbleLightPower;
+
+/////////////////////////////////////////
+
+void main(){
+    vec3 RealCol;
+    if(isInstanced == 1) RealCol = vec3(BubbleCol);
+    else RealCol = col;
+	// Light emission properties
+	// You probably want to put them as uniforms
+	vec3 LightColor = vec3(1,1,1);
+	float LightPower = 0.7f;
+
+	// Material properties
+	vec3 MaterialAmbientColor = vec3(0.01,0.01,0.01);
+	vec3 MaterialSpecularColor = vec3(0.3,0.3,0.3);
+
+	// Distance to the light
+	float distance = length( LightPosition_worldspace - Position_worldspace );
+
+	vec3 n = normalize( Normal_cameraspace );
+	//if(BubbleCol[3] == 1) n = -n;
+	vec3 l = normalize( LightDirection_cameraspace );
+	float cosTheta = clamp( dot( n,l ), 0,1 );
+
+	vec3 E = normalize(EyeDirection_cameraspace);
+	vec3 R = reflect(-l,n);
+
+	float cosAlpha = clamp( dot( E,R ), 0,1 );
+
+	color =
+		// Ambient : simulates indirect lighting
+		//MaterialAmbientColor*LightColor +
+		// Diffuse : "color" of the object
+		RealCol * LightColor * LightPower * cosTheta  +
+		// Specular : reflective highlight, like a mirror
+		MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) ;
+
+	////////////////////////////////////////////////////////////////////////////////// Player Light
+
+
+	distance = length( PlayerLightPos_worldspace - Position_worldspace );
+
+	//n = normalize( Normal_cameraspace );
+	l = normalize( PlayerLightDir_cameraspace );
+	cosTheta = clamp( dot( n,l ), 0,1 );
+
+	E = normalize(EyeDirection_cameraspace);
+	R = reflect(-l,n);
+
+	cosAlpha = clamp( dot( E,R ), 0,1 );
+
+	color +=
+		// Ambient : simulates indirect lighting
+		MaterialAmbientColor*PlayerLightCol +
+		// Diffuse : "color" of the object
+		RealCol * PlayerLightCol * LightPower*5 * cosTheta /(distance*distance) +
+		// Specular : reflective highlight, like a mirror
+		MaterialSpecularColor * PlayerLightCol * LightPower*5 * pow(cosAlpha,2)/(distance*distance);//+
+        //    vec3(0, 0, 1)*(1/pow(2, -distance)) ;
+    //////////////////////////////////////////////////////////////////////////////////// Bubbles Light
+
+
+    for(int i = 0; i < NumberOfLight; i++)
+    {
+        distance = length( BubblesLightPos_worldspace[i] - Position_worldspace );
+
+        //n = normalize( Normal_cameraspace );
+        l = normalize( BubblesLightDir_cameraspace[i] );
+        cosTheta = clamp( dot( n,l ), 0,1 );
+
+        E = normalize(EyeDirection_cameraspace);
+        R = reflect(-l,n);
+
+        cosAlpha = clamp( dot( E,R ), 0,1 );
+        //if(BubblesLightColor[i].x > 0.8) color = vec3(1, 1, 0);
+        color +=
+            // Ambient : simulates indirect lighting
+            MaterialAmbientColor*BubblesLightColor[i] +
+            // Diffuse : "color" of the object
+            RealCol * BubblesLightColor[i] * LightPower*10 * cosTheta/(distance*distance)  +
+            // Specular : reflective highlight, like a mirror
+            MaterialSpecularColor * BubblesLightColor[i] * LightPower*10 * pow(cosAlpha,5)/(distance*distance);
+    }
+    //color = vec3(1, 0, 0);
+    distance = length( PlayerLightPos_worldspace - Position_worldspace );
+    color = color + (vec3(0, 0, 1) - vec3(0, 0, 1)*pow(2.71, -distance*0.8));
+    color = color*pow(2.71, -distance*0.25);
+}
