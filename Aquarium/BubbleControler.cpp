@@ -25,10 +25,6 @@ void LevelUp(game_object player, float DeltaTime, float &bubble_size, float &bub
     else LevelTime += DeltaTime;
 }
 
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void move_bubbles(game_object bubble, std::queue<vec4> &bubblesPosAndSize, std::queue<vec4> &bubblesColAndLight,
@@ -43,67 +39,41 @@ void move_bubbles(game_object bubble, std::queue<vec4> &bubblesPosAndSize, std::
     vec3 LightCol[15];
     int n = 0;
 
-
-    if(!pause || pause)
+    while(!bubblesPosAndSize.empty())
     {
+        bubblePosAndSize = bubblesPosAndSize.front();
+        bubbleColAndLight = bubblesColAndLight.front();
 
-        //bubblePosAndSize = bubblesPosAndSize.front();
-        //bubbleColAndLight = bubblesColAndLight.front();
-
-        while(!bubblesPosAndSize.empty())
+        if(bubblePosAndSize.y < 5.0f && !pause) // moving bubble up if he is not to high
         {
+            bubblePosAndSize += vec4(0.0f, bubble_speed*DeltaTime, 0.0f, 0.1f/(10.0f/(0.5f*DeltaTime)));
 
-            bubblePosAndSize = bubblesPosAndSize.front();
-            bubbleColAndLight = bubblesColAndLight.front();
-            //bubblePosAndSize = vec4(vec3(bubblePosAndSize) + vec3(player.get_trans().x, 0, 0), bubblePosAndSize[3]);
-            //std::cout << player.get_trans().x << std::endl;
-            if(bubblePosAndSize.y < 5.0f && !pause)
-            {
-                bubblePosAndSize += vec4(0.0f, bubble_speed*DeltaTime, 0.0f, 0.1f/(10.0f/(0.5f*DeltaTime)));
-
-                new_bubblesPosAndSize.push(bubblePosAndSize);
-                new_bubblesColAndLight.push(bubbleColAndLight);
-                k++;
-                if(bubbleColAndLight[3] == 1 && n < 15)
-                {
-                    LightPos[n] = vec3(bubblePosAndSize);
-                    LightCol[n] = vec3(bubbleColAndLight);
-                    n++;
-                }
-            }
-            if(pause)
-            {
-
-                new_bubblesPosAndSize.push(bubblePosAndSize);
-                new_bubblesColAndLight.push(bubbleColAndLight);
-                k++;
-            }
-            bubblesPosAndSize.pop();
-            bubblesColAndLight.pop();
-        }
-
-
-    }
-    else
-    {
-
-        while(!bubblesPosAndSize.empty())
-        {
-            bubblePosAndSize = bubblesPosAndSize.front();
-            bubbleColAndLight = bubblesColAndLight.front();
             new_bubblesPosAndSize.push(bubblePosAndSize);
             new_bubblesColAndLight.push(bubbleColAndLight);
-            bubblesPosAndSize.pop();
-            bubblesColAndLight.pop();
+            k++;
+            if(bubbleColAndLight[3] == 1 && n < 15) // if bubble is light
+            {
+                LightPos[n] = vec3(bubblePosAndSize);
+                LightCol[n] = vec3(bubbleColAndLight);
+                n++;
+            }
         }
+        if(pause) // if the game is paused we just rewrite the queue
+        {
+
+            new_bubblesPosAndSize.push(bubblePosAndSize);
+            new_bubblesColAndLight.push(bubbleColAndLight);
+            k++;
+        }
+        bubblesPosAndSize.pop();
+        bubblesColAndLight.pop();
     }
-    //
 
     bubblesPosAndSize = new_bubblesPosAndSize;
     bubblesColAndLight = new_bubblesColAndLight;
     GLfloat PosAndSize[k*4];
     GLfloat ColAndLight[k*4];
-    for(int i = 0; i < k*4; i += 4)
+    for(int i = 0; i < k*4; i += 4) // making positions/sizes and color/islight buffers to instanced drawing
     {
         PosAndSize[i] = new_bubblesPosAndSize.front()[0];
         PosAndSize[i+1] = new_bubblesPosAndSize.front()[1];
@@ -118,9 +88,6 @@ void move_bubbles(game_object bubble, std::queue<vec4> &bubblesPosAndSize, std::
     }
 
     if(!pause) Mesh::ChangeBubbleLight(n, LightPos, LightCol);
-
-
-
     bubble.DrawInstanced(PosAndSize, ColAndLight, camera, k);
 }
 
@@ -152,18 +119,14 @@ void create_bubble(std::queue<vec4> &bubblesPosAndSize, std::queue<vec4> &bubble
     int HasLight;
     time_to_bubble += DeltaTime;
     float size;
-    if(time_to_bubble > bubble_frequency)
+    if(time_to_bubble > bubble_frequency) // creating bubble every bubble_frequency time
     {
-        //std::cout << ((double)rand() / RAND_MAX)*2 - 1 << std::endl;
         x = ((double)rand() / RAND_MAX)*aquaX - aquaX/2;
         y = ((double)rand() / RAND_MAX)*aquaY - aquaY/2;
         z = ((double)rand() / RAND_MAX)*aquaZ - (aquaZ*0.8 - player.get_trans().z);
-        /*R = ((double)rand() / RAND_MAX);
-        G = ((double)rand() / RAND_MAX);
-        B = ((double)rand() / RAND_MAX);*/
         size = ((double)rand() / RAND_MAX)*bubble_size + 0.1;
         vec3 color = colors[rand() %11];
-        //std::cout << x << " " << std::endl;
+
         if(x < -5.0f + size*0.9511f*2)
         {
             x = -5.0f + size*0.9511f;

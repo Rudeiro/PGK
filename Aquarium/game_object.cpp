@@ -11,7 +11,6 @@ game_object::game_object(vec3 trans, vec3 scale, Mesh mesh, Light light)
 
 void game_object::draw(float angle, Camera camera)
 {
-    //mat4 model = glm::translate(glm::mat4(), trans) * glm::scale(scale);
     mat4 model = glm::translate(glm::mat4(1.0f), trans) * glm::rotate(glm::mat4(1.0f), angle, vec3(0.0f, 1.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), scale);
     mesh.draw(model, angle, camera, light);
 }
@@ -35,8 +34,6 @@ vec3 game_object::get_scale()
 {
     return scale;
 }
-
-
 
 vec3 game_object::GetLightCol()
 {

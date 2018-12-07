@@ -35,13 +35,9 @@ extern float time_to_bubble;
 extern int Level;
 
 bool order(game_object g1, game_object g2);
-//void move_bubbles(std::queue<game_object> &bubbles, float DeltaTime, Camera camera, bool pause);
-//void create_bubble(std::queue<game_object> &bubbles, float DeltaTime);
-
 void LevelUp(game_object player, float DeltaTime, float &bubble_size, float &bubble_frequency, float &bubble_speed, float &LevelTime);
 void create_bubble(std::queue<vec4> &bubblesPosAndSize, std::queue<vec4> &bubblesColAndLight, float DeltaTime, game_object player,
                    float &bubble_size, float &bubble_frequency, float &bubble_speed);
-
 void move_bubbles(game_object bubble, std::queue<vec4> &bubblesPosAndSize, std::queue<vec4> &bubblesColAndLight, float DeltaTime,
                    Camera camera, bool pause, game_object player,
                     float &bubble_speed);

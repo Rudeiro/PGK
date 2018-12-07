@@ -28,11 +28,9 @@ void PlayerBehavior(game_object &player, GLFWwindow* &window, float DeltaTime, C
 void move(game_object &player, GLFWwindow* &window, float DeltaTime, Camera &camera,game_object &AquaBottom,game_object &AquaLeft,game_object &AquaRight,game_object &AquaFront,game_object &AquaBack)
 {
 
-
+    /////////////////////////////////////////////////////// Changing camera view according to mouse position
     double mouseX;
     double mouseY;
-
-
     float mouseSpeed = 0.5f;
     glfwGetCursorPos(window, &mouseX, &mouseY);
 
@@ -52,13 +50,16 @@ void move(game_object &player, GLFWwindow* &window, float DeltaTime, Camera &cam
         0,
         cos(horizontalAngle - 3.14f/2.0f)
     );
-    //std::cout << direction.x << " " << direction.y << " " << direction.z << std::endl;
     glm::vec3 up = glm::cross( right, direction );
+
+
     camera.ChangeWorldPos(player.get_trans() - direction*Zoom);
     camera.ChangeLookDir(player.get_trans() + direction);
     camera.ChangeUpVec(up);
 
+    ////////////////////////////////////////////////////////// Moving player with arrows and zooming camera with 'Z' and 'X'
     vec3 new_pos;
+    // Move forward
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
         new_pos = player.get_trans() + direction * DeltaTime * speed;
@@ -126,10 +127,12 @@ void move(game_object &player, GLFWwindow* &window, float DeltaTime, Camera &cam
     ChangeAquaPos( AquaBottom, AquaLeft, AquaRight, AquaFront, AquaBack, player);
 
 }
+
 double vec3Length(vec3 v)
 {
     return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
+
 game_object PlayerCollide(game_object player, std::queue<vec4> &PosAndSize, std::queue<vec4> &ColAndLight, float &bubble_size, float &bubble_frequency, float &bubble_speed)
 {
     std::queue<vec4> new_PosAndSize;
@@ -141,14 +144,9 @@ game_object PlayerCollide(game_object player, std::queue<vec4> &PosAndSize, std:
     {
         Pos = PosAndSize.front();
         Light = ColAndLight.front();
-        /*if(vec3Length(vec3(Pos) - player.get_trans()) > player.get_scale()[0]*0.9511f + Pos[3]*0.9511f )
-        {
-            new_PosAndSize.push(Pos);
-            new_ColAndLight.push(ColAndLight.front());
-        }*/
         if(vec3Length(vec3(Pos) - player.get_trans()) < player.get_scale()[0]*0.9511f + Pos[3]*0.9511f )
         {
-            if(Light[3] == 1)
+            if(Light[3] == 1) // if player collided with light bubble we increase speed temporarily
             {
                 speed *= 2;
                 TimeBonus = 0.0f;
@@ -157,7 +155,7 @@ game_object PlayerCollide(game_object player, std::queue<vec4> &PosAndSize, std:
                 Pos = PosAndSize.front();
                 Light = ColAndLight.front();
             }
-            else
+            else // other bubbles kill player and return him to the starting position
             {
                 collided = true;
                 player.change_trans(vec3(0, 0 ,0));
@@ -183,6 +181,7 @@ game_object PlayerCollide(game_object player, std::queue<vec4> &PosAndSize, std:
     return player;
 }
 
+//Moving aquarium with Z Axis of the player so it appear to be infinite
 void ChangeAquaPos(game_object &AquaBottom,game_object &AquaLeft,game_object &AquaRight,game_object &AquaFront,game_object &AquaBack, game_object player)
 {
     AquaBottom.change_trans(vec3(0, -5.1f, player.get_trans().z));
