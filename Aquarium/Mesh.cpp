@@ -9,7 +9,7 @@ GLint Mesh::t;
 GLint Mesh::s;
 GLint Mesh::c;
 GLint Mesh::r_y;
-GLint Mesh::matrixID;
+GLint Mesh::mvp;
 GLint Mesh::m;
 GLint Mesh::v;
 GLint Mesh::p;
@@ -22,6 +22,7 @@ GLint Mesh::isInstanced;
 int Mesh::LightBubbles;
 vec3 Mesh::BubbleLightsPos[15];
 vec3 Mesh::BubbleLightsCol[15];
+glm::mat4 Mesh::Projection;
 GLfloat a = (sqrt(5) + 1)/2;
 GLfloat b = 1;
 GLfloat Mesh::vertex[100000] =
@@ -160,8 +161,8 @@ void Mesh::init()
     BubLigCol = glGetUniformLocation(programID, "BubblesLightColor");
     BubLigWorldSpace = glGetUniformLocation(programID, "BubblesLightPos_worldspace");
 	NumOfLights = glGetUniformLocation(programID, "NumberOfLight");
-
-    glm::mat4 Projection = glm::perspective(glm::radians(45.0f), (float) 4/ (float) 4, 0.1f, 100.0f);
+    mvp = glGetUniformLocation(programID, "MVP");
+    Projection = glm::perspective(glm::radians(45.0f), (float) 4/ (float) 4, 0.1f, 100.0f);
     glUniformMatrix4fv(p, 1, GL_FALSE, &Projection[0][0]);
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -296,34 +297,6 @@ void Mesh::init()
 	glGenBuffers(1, &vertexnormal);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexnormal);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Normals), Normals, GL_STATIC_DRAW);
-}
-void Mesh::clear()
-{
-    glDeleteBuffers(1, &vertexbuffer);
-    glDeleteProgram(programID);
-}
-
-void Mesh::draw(glm::mat4 model, float angle, Camera camera, Light light)
-{
-    //glm:mat4 MVP = Projection*camera.View()*model;
-
-    glUniform3f(t, 4.0f, 30.0f, 15.0f); // sun light position
-    glUniformMatrix4fv(v, 1, GL_FALSE, &camera.View()[0][0]);
-    glUniformMatrix4fv(m, 1, GL_FALSE, &model[0][0]);
-    glUniform3f(c, color[0], color[1], color[2]);
-
-
-    if(light.GetType() == 1) // if object is our player
-    {
-        glUniform3f(PLightColor, light.GetCol()[0], light.GetCol()[1], light.GetCol()[2]);
-        glUniform3f(PLightPos, light.GetPos()[0], light.GetPos()[1], light.GetPos()[2]);
-    }
-
-    glUniform3fv(BubLigCol, LightBubbles, value_ptr(BubbleLightsCol[0]));
-    glUniform3fv(BubLigWorldSpace, LightBubbles, value_ptr(BubbleLightsPos[0]));
-
-    glUniform1i(isInstanced, 0);
-    glUniform1i(NumOfLights, LightBubbles);
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -346,6 +319,62 @@ void Mesh::draw(glm::mat4 model, float angle, Camera camera, Light light)
         0,                  // stride
         (void*)0            // array buffer offset
     );
+
+    glGenBuffers(1, &colbuffer);
+    glGenBuffers(1, &posbuffer);
+
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, posbuffer);
+    glVertexAttribPointer(
+        2,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+        4,                  // size
+        GL_FLOAT,           // type
+        GL_FALSE,           // normalized?
+        0,                  // stride
+        (void*)0            // array buffer offset
+    );
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, colbuffer);
+
+    glVertexAttribPointer(
+        3,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+        4,                  // size
+        GL_FLOAT,           // type
+        GL_FALSE,           // normalized?
+        0,                  // stride
+        (void*)0            // array buffer offset
+    );
+    glVertexAttribDivisor(2, 1); // positions : one per quad (its center) -> 1
+    glVertexAttribDivisor(3, 1);
+}
+void Mesh::clear()
+{
+    glDeleteBuffers(1, &vertexbuffer);
+    glDeleteProgram(programID);
+}
+
+void Mesh::draw(glm::mat4 model, float angle, Camera camera, Light light)
+{
+    glm:mat4 MVP = Projection*camera.View()*model;
+    glUniformMatrix4fv(mvp, 1, GL_FALSE, &MVP[0][0]);
+    glUniform3f(t, 4.0f, 30.0f, 15.0f); // sun light position
+    glUniformMatrix4fv(v, 1, GL_FALSE, &camera.View()[0][0]);
+    glUniformMatrix4fv(m, 1, GL_FALSE, &model[0][0]);
+    glUniform3f(c, color[0], color[1], color[2]);
+
+
+    if(light.GetType() == 1) // if object is our player
+    {
+        glUniform3f(PLightColor, light.GetCol()[0], light.GetCol()[1], light.GetCol()[2]);
+        glUniform3f(PLightPos, light.GetPos()[0], light.GetPos()[1], light.GetPos()[2]);
+    }
+
+    glUniform3fv(BubLigCol, LightBubbles, value_ptr(BubbleLightsCol[0]));
+    glUniform3fv(BubLigWorldSpace, LightBubbles, value_ptr(BubbleLightsPos[0]));
+
+    glUniform1i(isInstanced, 0);
+    glUniform1i(NumOfLights, LightBubbles);
+
     glDrawArrays(GL_TRIANGLES, shape, v_num);
 }
 
@@ -374,64 +403,13 @@ void Mesh::DrawInstanced(GLfloat PosAndSize[100000], GLfloat ColorAndLight[10000
         BubbleColAndLight[i] = ColorAndLight[i];
     }
 
-
-    glGenBuffers(1, &posbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, posbuffer);
-    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
     glBufferData(GL_ARRAY_BUFFER,  sizeof(BubblePosAndSize), BubblePosAndSize, GL_STREAM_DRAW);
-
-    glGenBuffers(1, &colbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colbuffer);
-    // Initialize with empty (NULL) buffer : it will be updated later, each frame.
     glBufferData(GL_ARRAY_BUFFER,sizeof(BubbleColAndLight), BubbleColAndLight, GL_STREAM_DRAW);
 
     glUniform3f(t, 4.0f, 30.0f, 15.0f);
     glUniformMatrix4fv(v, 1, GL_FALSE, &camera.View()[0][0]);
 
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(
-        0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-        3,                  // size
-        GL_FLOAT,           // type
-        GL_FALSE,           // normalized?
-        0,                  // stride
-        (void*)0            // array buffer offset
-    );
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexnormal);
-
-    glVertexAttribPointer(
-        1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-        3,                  // size
-        GL_FLOAT,           // type
-        GL_FALSE,           // normalized?
-        0,                  // stride
-        (void*)0            // array buffer offset
-    );
-
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, posbuffer);
-    glVertexAttribPointer(
-        2,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-        4,                  // size
-        GL_FLOAT,           // type
-        GL_FALSE,           // normalized?
-        0,                  // stride
-        (void*)0            // array buffer offset
-    );
-    glEnableVertexAttribArray(3);
-    glBindBuffer(GL_ARRAY_BUFFER, colbuffer);
-
-    glVertexAttribPointer(
-        3,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-        4,                  // size
-        GL_FLOAT,           // type
-        GL_FALSE,           // normalized?
-        0,                  // stride
-        (void*)0            // array buffer offset
-    );
-    glVertexAttribDivisor(2, 1); // positions : one per quad (its center) -> 1
-    glVertexAttribDivisor(3, 1);
     glDrawArraysInstanced(GL_TRIANGLES, shape, v_num, n);
 }

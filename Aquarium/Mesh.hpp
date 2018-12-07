@@ -47,7 +47,7 @@ protected:
     static GLint m;
     static GLint v;
     static GLint p;
-    static GLint matrixID;
+    static GLint mvp;
     static GLfloat vertex[100000];
     static GLfloat Normals[100000];
     static GLfloat cube[1000];
@@ -64,6 +64,7 @@ protected:
     static GLuint posbuffer;
     static GLuint colbuffer;
     static GLint isInstanced;
+    static glm::mat4 Projection;
 
 
 public:

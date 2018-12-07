@@ -8,7 +8,17 @@ void LevelUp(game_object player, float DeltaTime, float &bubble_size, float &bub
 {
     if(bubble_size <= 0.3f)
     {
-        //std::cout << "\033[2J\033[0;0H" << std::endl;
+        std::cout << "\033[2J\033[0;0H" << std::endl;
+        std::cout << "GAME DESCRIPTION\n";
+        std::cout << "Your goal is to travel through the aquarium as far as you can.\n";
+        std::cout << "You can collect light bubbles to temporarily increase your speed \n";
+        std::cout << "but be careful about other bubbles cause if you touch theme you start\n";
+        std::cout << "from the beginnig.\n";
+        std::cout << "PLAYER CONTROL\n";
+        std::cout << "You move with the arrows according to camera view.\n";
+        std::cout << "You can zoom camera view using 'Z' and 'X'\n";
+        std::cout << "You can use TAB to pause the game and see the aquarium from outside.\n";
+        std::cout << "You can use 'F' do enable/disable cursor\n";
         Level = 0;
     }
     if(LevelTime > 5.0f)

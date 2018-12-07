@@ -33,6 +33,7 @@ uniform int isInstanced;
 uniform mat4 P;
 uniform mat4 V;
 uniform mat4 M;
+uniform mat4 MVP;
 
 /////////////////////////////////////// Sun Light
 
@@ -53,7 +54,7 @@ void main(){
     if(isInstanced == 0) //Normal drawing
     {
         // Output position of the vertex, in clip space : MVP * position
-        mat4 MVP = P*V*M;
+
         gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
 
         // Position of the vertex, in worldspace : M * position
