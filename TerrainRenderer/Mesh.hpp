@@ -41,6 +41,7 @@ protected:
     static GLint v;
     static GLint p;
     static GLint mvp;
+    static GLint c;
     static GLfloat vertex[100000];
     static GLuint vertexbuffer;
     static glm::mat4 Projection;
@@ -55,6 +56,7 @@ public:
     {}
     static void init();
     static void clear();
+    void draw(glm::mat4 model, Camera camera);
    
 };
 

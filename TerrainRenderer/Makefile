@@ -3,18 +3,20 @@ GL = -lGLEW -lGL -lglfw
 LIBS = -L../lib/ -L/home/anl/lib/
 INCLUDES = -I../include/ -I/home/anl/include/
 
-Aquarium.out: aquarium.o Camera.o Mesh.o 
-	$(GCC) -o Aquarium.out aquarium.o Camera.o Mesh.o $(GL) $(LIBS) -lcommon
+Terrain.out: terrain.o Camera.o Mesh.o GameObject.o
+	$(GCC) -o Terrain.out terrain.o Camera.o Mesh.o GameObject.o $(GL) $(LIBS) -lcommon
 
-aquarium.o: aquarium.cpp Mesh.hpp Camera.hpp
-	$(GCC) -c $(INCLUDES) aquarium.cpp
+terrain.o: terrain.cpp Mesh.hpp Camera.hpp
+	$(GCC) -c $(INCLUDES) terrain.cpp
 
 Mesh.o: Mesh.cpp Mesh.hpp Camera.hpp
 	$(GCC) -c $(INCLUDES) Mesh.cpp
 
-Camera.o: Camera.cpp Camera.hpp
+Camera.o: Camera.hpp Camera.hpp
 	$(GCC) -c $(INCLUDES) Camera.cpp
 
+GameObject.o: GameObject.cpp GameObject.hpp Mesh.hpp
+	$(GCC) -c $(INCLUDES) GameObject.cpp
 
 clean:
 	rm -f *.o *.out

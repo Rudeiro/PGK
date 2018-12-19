@@ -23,6 +23,10 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include "Mesh.hpp"
+#include "GameObject.hpp"
+#include "Camera.hpp"
+
+Camera camera = Camera(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if(key == GLFW_KEY_TAB)
@@ -41,9 +45,9 @@ void window_size(GLFWwindow* window, int width, int height)
 }
 int main(int argc, char* argv[] )
 {
-    
+    GameObject triangle = GameObject(vec3(0, 0, 0), vec3(1, 1, 1), Mesh(vec3(1, 0, 0), 0, 9));
     srand((unsigned)time(0));
-
+	//////////////////////////////////////////////////////////
     if( !glfwInit() )
 	{
 		fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -88,6 +92,7 @@ int main(int argc, char* argv[] )
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
+	/////////////////////////////////////////////////////////////////////////////////////
 
     float frame;
     float pre_frame;
@@ -100,8 +105,9 @@ int main(int argc, char* argv[] )
     do{
         // Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-       
+		
+		triangle.draw(camera);
+		
 
         frame = glfwGetTime();
         delta_time = -pre_frame + frame;
