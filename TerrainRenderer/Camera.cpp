@@ -1,0 +1,30 @@
+#include "Camera.hpp"
+
+vec3 Camera::GetWorldPos()
+{
+    return WorldPos;
+}
+void Camera::ChangeWorldPos(vec3 NewWorldPos)
+{
+    WorldPos = NewWorldPos;
+}
+vec3 Camera::GetLookDir()
+{
+    return LookDir;
+}
+void Camera::ChangeLookDir(vec3 NewLookDir)
+{
+    LookDir = NewLookDir;
+}
+vec3 Camera::GetUpVec()
+{
+    return UpVec;
+}
+void Camera::ChangeUpVec(vec3 NewUpVec)
+{
+    UpVec = NewUpVec;
+}
+glm::mat4 Camera::View()
+{
+    return glm::lookAt(WorldPos, LookDir, UpVec);
+}
