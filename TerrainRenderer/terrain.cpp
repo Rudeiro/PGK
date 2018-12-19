@@ -24,6 +24,7 @@ using namespace glm;
 #include <common/shader.hpp>
 #include "Mesh.hpp"
 #include "GameObject.hpp"
+#include "DataReader.hpp"
 #include "Camera.hpp"
 
 Camera camera = Camera(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
@@ -101,7 +102,11 @@ int main(int argc, char* argv[] )
     delta_time = 1.0f /60.0f;
     pre_frame = frame - delta_time;
     Mesh::init();
-   
+	std::vector<short> heights;
+	heights = DataReader::ReadBinaryFile(heights);
+	for(int i = 0; i < heights.size(); i++) 
+		std::cout << heights[i] << std::endl;
+	//std::cout << heights.size()<< std::endl;
     do{
         // Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
