@@ -1,5 +1,6 @@
 #version 330 core
 
+in float ht;
 
 out vec3 color;
 
@@ -8,5 +9,10 @@ uniform vec3 col;
 
 void main()
 {
-    color = col;
+    if(ht < 0) color = vec3(0., 0., 1.);
+    else if(ht < 500) color = vec3(0., ht/500, 0.);
+    else if(ht < 1000) color = vec3(ht/500 -1, 1., 0.);
+    else if(ht < 2000) color = vec3(1., 2. - ht/1000, 0.);
+    else               color = vec3(1., ht/2000 -1, ht/2000 - 1);
+    //color = vec3(0., height/500, 0.);
 }

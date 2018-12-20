@@ -27,7 +27,7 @@ using namespace glm;
 #include "DataReader.hpp"
 #include "Camera.hpp"
 
-Camera camera = Camera(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+Camera camera = Camera(glm::vec3(0, 0, 480), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if(key == GLFW_KEY_TAB)
@@ -103,16 +103,16 @@ int main(int argc, char* argv[] )
     pre_frame = frame - delta_time;
     Mesh::init();
 	std::vector<short> heights;
-	heights = DataReader::ReadBinaryFile(heights);
-	for(int i = 0; i < heights.size(); i++) 
-		std::cout << heights[i] << std::endl;
+	heights = DataReader::ReadBinaryFile();
+	//for(int i = 0; i < heights.size(); i++) 
+		//std::cout << heights[i] << std::endl;
 	//std::cout << heights.size()<< std::endl;
     do{
         // Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		
-		triangle.draw(camera);
-		
+		//triangle.draw(camera);
+		Mesh::DrawElem(camera);
 
         frame = glfwGetTime();
         delta_time = -pre_frame + frame;

@@ -30,7 +30,7 @@ using namespace glm;
 class DataReader
 {
 public:
-    static std::vector<short> ReadBinaryFile(std::vector<short> heights);
+    static std::vector<short> ReadBinaryFile();
 
 };
 #endif

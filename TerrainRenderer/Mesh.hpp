@@ -27,6 +27,7 @@ using namespace glm;
 #include <common/shader.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Camera.hpp"
+#include "DataReader.hpp"
 
 class Mesh
 {
@@ -43,6 +44,9 @@ protected:
     static GLint mvp;
     static GLint c;
     static GLfloat vertex[100000];
+    static GLfloat map[4500000];
+    static GLuint Order[4500000];
+    static GLuint orderbuffer;
     static GLuint vertexbuffer;
     static glm::mat4 Projection;
 
@@ -57,6 +61,7 @@ public:
     static void init();
     static void clear();
     void draw(glm::mat4 model, Camera camera);
+    static void DrawElem(Camera camera);
    
 };
 

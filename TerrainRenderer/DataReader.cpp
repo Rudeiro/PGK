@@ -1,15 +1,25 @@
 #include "DataReader.hpp"
-
-std::vector<short> DataReader::ReadBinaryFile(std::vector<short> heights)
+void swapBytes(short *a)
 {
+    char *b = (char*)a;
+    char t = *a;
+    b[0] = b[1];
+    b[1] = t;
+}
+
+std::vector<short> DataReader::ReadBinaryFile()
+{
+    std::vector<short> heights;
     short x;
     std::ifstream infile;
     infile.open("N45E006.hgt", std::ios::binary | std::ios::in);
     while(infile.read(reinterpret_cast<char *>(&x), sizeof(short)) )
     {
+        //__builtin_bswap16 (x)
+        swapBytes(&x);
         //std::cout << __builtin_bswap16 (x) << std::endl;
-        heights.push_back(__builtin_bswap16 (x));
+        heights.push_back(x);
     }
     return heights;
-    //std::cout << heights.size();
+   
 }
