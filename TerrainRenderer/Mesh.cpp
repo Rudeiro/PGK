@@ -1,6 +1,7 @@
 #include "Mesh.hpp"
 
 GLuint Mesh::programID;
+GLuint Mesh::programID_3D;
 GLint Mesh::mvp;
 GLint Mesh::m;
 GLint Mesh::v;
@@ -14,6 +15,11 @@ GLint Mesh::pX;
 GLint Mesh::pY;
 GLint Mesh::siX;
 GLint Mesh::siY;
+
+GLint Mesh::pX_3D;
+GLint Mesh::pY_3D;
+GLint Mesh::siX_3D;
+GLint Mesh::siY_3D;
 std::vector<std::vector<short>> Mesh::heights;
 std::vector<int> Mesh::GridPosX;
 std::vector<int> Mesh::GridPosY;
@@ -31,7 +37,20 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(1500000);
-    programID = LoadShaders( "StandardShading.vertexshader", "StandardShading.fragmentshader" );
+    programID_3D = LoadShaders( "3DView.vertexshader", "Terrain.fragmentshader" );
+    glUseProgram(programID_3D);
+
+	mvp = glGetUniformLocation(programID_3D, "MVP");
+    
+    pX_3D = glGetUniformLocation(programID_3D, "gridPosX");
+    pY_3D = glGetUniformLocation(programID_3D, "gridPosY");
+    siY_3D = glGetUniformLocation(programID_3D, "sizeY");
+    siX_3D = glGetUniformLocation(programID_3D, "sizeX");
+
+    glUniform1i(siX_3D, kdl - pdl);
+    glUniform1i(siY_3D, ksz - psz);
+
+    programID = LoadShaders( "FlatView.vertexshader", "Terrain.fragmentshader" );
     glUseProgram(programID);
 
 	mvp = glGetUniformLocation(programID, "MVP");
@@ -151,7 +170,7 @@ void Mesh::DrawElem(Camera camera)
 {
     glm:mat4 MVP = Projection*camera.View()*glm::mat4(1.0f);
     glUniformMatrix4fv(mvp, 1, GL_FALSE, &MVP[0][0]);
-    glUniform3f(c, 1, 0, 0);
+    
     int k = heights.size();
 
     //glDrawArrays(GL_TRIANGLES, 0, 9);
@@ -165,4 +184,10 @@ void Mesh::DrawElem(Camera camera)
         //glDrawElements(GL_TRIANGLE_STRIP, 2403, GL_UNSIGNED_INT, (void*)0);
     }
     //glDrawRangeElements(GL_TRIANGLE_STRIP, 2402, 4804, 2402, GL_UNSIGNED_INT, (void*)0);
+}
+
+void Mesh::SwitchView(bool type)
+{
+    if(type) glUseProgram(programID);
+    else glUseProgram(programID_3D);
 }

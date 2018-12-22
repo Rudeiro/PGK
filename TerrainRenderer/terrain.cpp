@@ -27,13 +27,14 @@ using namespace glm;
 #include "GameObject.hpp"
 #include "DataReader.hpp"
 #include "Camera.hpp"
-
+bool view = true;
 Camera camera = Camera(glm::vec3(0, 0, 480), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    if(key == GLFW_KEY_TAB)
+    if(key == GLFW_KEY_E)
     {
-        
+        view = !view;
+		Mesh::SwitchView(view);
     }
     else if(key == GLFW_KEY_F)
     {

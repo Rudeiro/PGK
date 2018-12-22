@@ -40,6 +40,7 @@ protected:
 
     
     static GLuint programID;
+    static GLuint programID_3D;
     static GLint m;
     static GLint v;
     static GLint p;
@@ -56,6 +57,10 @@ protected:
     static GLint pY;
     static GLint siX;
     static GLint siY;
+    static GLint pX_3D;
+    static GLint pY_3D;
+    static GLint siX_3D;
+    static GLint siY_3D;
     static std::vector<int> GridPosX;
     static std::vector<int> GridPosY;
 
@@ -70,6 +75,7 @@ public:
     static void clear();
     void draw(glm::mat4 model, Camera camera);
     static void DrawElem(Camera camera);
+    static void SwitchView(bool type);
    
 };
 
