@@ -11,6 +11,7 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include <string>
 
 
 // Include GLEW
@@ -30,7 +31,7 @@ using namespace glm;
 class DataReader
 {
 public:
-    static std::vector<short> ReadBinaryFile();
+    static std::vector<short> ReadBinaryFile(std::string filename);
 
 };
 #endif

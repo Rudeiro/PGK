@@ -10,6 +10,14 @@ glm::mat4 Mesh::Projection;
 GLuint Mesh::vertexbuffer;
 GLuint Mesh::orderbuffer;
 
+GLint Mesh::pX;
+GLint Mesh::pY;
+GLint Mesh::siX;
+GLint Mesh::siY;
+std::vector<std::vector<short>> Mesh::heights;
+std::vector<int> Mesh::GridPosX;
+std::vector<int> Mesh::GridPosY;
+
 GLfloat Mesh::vertex[100000] =
 {
    0.0f, 0.0f, 0.0f,
@@ -18,7 +26,7 @@ GLfloat Mesh::vertex[100000] =
 };
 GLfloat Mesh::map[4500000];
 GLuint Mesh::Order[4500000];
-void Mesh::init()
+void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
 {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PRIMITIVE_RESTART);
@@ -28,24 +36,45 @@ void Mesh::init()
 
 	mvp = glGetUniformLocation(programID, "MVP");
     c = glGetUniformLocation(programID, "col");
-    glUniform3f(c, 1, 0, 0);
+    pX = glGetUniformLocation(programID, "gridPosX");
+    pY = glGetUniformLocation(programID, "gridPosY");
+    siY = glGetUniformLocation(programID, "sizeY");
+    siX = glGetUniformLocation(programID, "sizeX");
+
+    glUniform1i(siX, kdl - pdl);
+    glUniform1i(siY, ksz - psz);
+
     Projection = glm::perspective(glm::radians(45.0f), (float) 4/ (float) 4, 0.1f, 100.0f);
     glUniformMatrix4fv(p, 1, GL_FALSE, &Projection[0][0]);
 
-    std::vector<short> heights = DataReader::ReadBinaryFile();
-    for(int i = 0; i < heights.size(); i++)
-        map[i] = heights[i];
-    /*map[0] = heights[0];
-    map[1] = heights[1];
-    map[2] = heights[1201];*/
-    /*map[0] = 0;
-    map[1] = 0;
-    map[3] = 0;
-    map[4] = 1;
-    map[5] = heights[1];
-    map[6] = 1;
-    map[7] = 0;
-    map[8] = heights[1201];*/
+     
+    
+    //std::string path = "/home/konrad/repositories/PGK/TerrainRenderer/maps";
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir ("/home/konrad/repositories/PGK/TerrainRenderer/maps")) != NULL) {
+        /* print all the files and directories within directory */
+        while ((ent = readdir (dir)) != NULL) {
+        
+        std::string filename = ent->d_name;
+        int sz;
+        int dl;
+        if(filename.size() == 11)
+        {
+            sz = std::stoi(filename.substr(1, 2));
+            dl = std::stoi(filename.substr(5, 3));
+            if(sz >= psz && sz < ksz && dl >= pdl && dl < kdl)
+            { 
+                heights.push_back(DataReader::ReadBinaryFile(dirname + filename));
+                GridPosX.push_back(dl - pdl);
+                GridPosY.push_back(-sz + ksz-1);
+            }
+        }
+        
+        }
+    closedir (dir);
+    }
+    
     int a = 0;
     for(int k = 0; k < 1199; k++)
     {
@@ -76,13 +105,13 @@ void Mesh::init()
 
     glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(map), map, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[0].size(), &heights[0][0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(
         0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
         1,                  // size
-        GL_FLOAT,           // type
+        GL_SHORT,           // type
         GL_FALSE,           // normalized?
         0,                  // stride
         (void*)0            // array buffer offset
@@ -123,8 +152,16 @@ void Mesh::DrawElem(Camera camera)
     glm:mat4 MVP = Projection*camera.View()*glm::mat4(1.0f);
     glUniformMatrix4fv(mvp, 1, GL_FALSE, &MVP[0][0]);
     glUniform3f(c, 1, 0, 0);
+    int k = heights.size();
 
     //glDrawArrays(GL_TRIANGLES, 0, 9);
-    glDrawElements(GL_TRIANGLE_STRIP, 2403*1200, GL_UNSIGNED_INT, (void*)0);
+    for(int i = 0; i < k; i++)
+    {
+        glUniform1i(pX, GridPosX[i]);
+        glUniform1i(pY, -GridPosY[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glDrawElements(GL_TRIANGLE_STRIP, 2403*1200, GL_UNSIGNED_INT, (void*)0);
+    }
     //glDrawRangeElements(GL_TRIANGLE_STRIP, 2402, 4804, 2402, GL_UNSIGNED_INT, (void*)0);
 }

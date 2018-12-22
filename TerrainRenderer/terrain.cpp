@@ -5,6 +5,7 @@
 #include <ctime>
 #include <iostream>
 #include <algorithm>
+#include <string>
 #include <vector>
 #include <cmath>
 #include <queue>
@@ -46,6 +47,11 @@ void window_size(GLFWwindow* window, int width, int height)
 }
 int main(int argc, char* argv[] )
 {
+	std::string folder = argv[1];
+	int psz = std::stoi(argv[2]);
+	int ksz = std::stoi(argv[3]);
+	int pdl = std::stoi(argv[4]);
+	int kdl = std::stoi(argv[5]);
     GameObject triangle = GameObject(vec3(0, 0, 0), vec3(1, 1, 1), Mesh(vec3(1, 0, 0), 0, 9));
     srand((unsigned)time(0));
 	//////////////////////////////////////////////////////////
@@ -101,9 +107,9 @@ int main(int argc, char* argv[] )
     frame = glfwGetTime();
     delta_time = 1.0f /60.0f;
     pre_frame = frame - delta_time;
-    Mesh::init();
+    Mesh::init(folder, psz, ksz, pdl, kdl);
 	std::vector<short> heights;
-	heights = DataReader::ReadBinaryFile();
+	//heights = DataReader::ReadBinaryFile();
 	//for(int i = 0; i < heights.size(); i++) 
 		//std::cout << heights[i] << std::endl;
 	//std::cout << heights.size()<< std::endl;

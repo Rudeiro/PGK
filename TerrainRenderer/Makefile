@@ -1,4 +1,4 @@
-GCC = g++ -std=c++11 -g
+GCC = g++ -std=c++17 -g -lstdc++fs
 GL = -lGLEW -lGL -lglfw
 LIBS = -L../lib/ -L/home/anl/lib/
 INCLUDES = -I../include/ -I/home/anl/include/

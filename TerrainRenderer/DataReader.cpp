@@ -7,12 +7,12 @@ void swapBytes(short *a)
     b[1] = t;
 }
 
-std::vector<short> DataReader::ReadBinaryFile()
+std::vector<short> DataReader::ReadBinaryFile(std::string filename)
 {
     std::vector<short> heights;
     short x;
     std::ifstream infile;
-    infile.open("N45E006.hgt", std::ios::binary | std::ios::in);
+    infile.open(filename, std::ios::binary | std::ios::in);
     while(infile.read(reinterpret_cast<char *>(&x), sizeof(short)) )
     {
         //__builtin_bswap16 (x)
@@ -20,6 +20,8 @@ std::vector<short> DataReader::ReadBinaryFile()
         //std::cout << __builtin_bswap16 (x) << std::endl;
         heights.push_back(x);
     }
+
+    
     return heights;
    
 }

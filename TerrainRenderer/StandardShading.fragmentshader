@@ -4,7 +4,7 @@ in float ht;
 
 out vec3 color;
 
-uniform vec3 col;
+
 
 
 void main()

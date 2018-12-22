@@ -9,7 +9,9 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <string>
 #include <cmath>
+#include <dirent.h>
 
 
 // Include GLEW
@@ -49,7 +51,13 @@ protected:
     static GLuint orderbuffer;
     static GLuint vertexbuffer;
     static glm::mat4 Projection;
-
+    static std::vector<std::vector<short>> heights;
+    static GLint pX;
+    static GLint pY;
+    static GLint siX;
+    static GLint siY;
+    static std::vector<int> GridPosX;
+    static std::vector<int> GridPosY;
 
 public:
     Mesh(){};
@@ -58,7 +66,7 @@ public:
           shape (shape),
           v_num (v_num)
     {}
-    static void init();
+    static void init(std::string dirname, int psz, int ksz, int pdl, int kdl);
     static void clear();
     void draw(glm::mat4 model, Camera camera);
     static void DrawElem(Camera camera);
