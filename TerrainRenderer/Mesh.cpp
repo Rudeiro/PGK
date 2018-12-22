@@ -162,6 +162,7 @@ void Mesh::DrawElem(Camera camera)
         glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glDrawElements(GL_TRIANGLE_STRIP, 2403*1200, GL_UNSIGNED_INT, (void*)0);
+        //glDrawElements(GL_TRIANGLE_STRIP, 2403, GL_UNSIGNED_INT, (void*)0);
     }
     //glDrawRangeElements(GL_TRIANGLE_STRIP, 2402, 4804, 2402, GL_UNSIGNED_INT, (void*)0);
 }
