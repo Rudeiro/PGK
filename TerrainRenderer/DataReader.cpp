@@ -19,6 +19,7 @@ std::vector<short> DataReader::ReadBinaryFile(std::string filename)
         swapBytes(&x);
         //std::cout << __builtin_bswap16 (x) << std::endl;
         heights.push_back(x);
+        //std::cout << x << std::endl;
     }
     int k = 0;
     for(int i = 0; i < heights.size(); i++)

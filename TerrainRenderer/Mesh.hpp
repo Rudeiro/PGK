@@ -63,6 +63,8 @@ protected:
     static GLint siY_3D;
     static std::vector<int> GridPosX;
     static std::vector<int> GridPosY;
+    static int szerokosc;
+    static int dlugosc;
 
 public:
     Mesh(){};
@@ -74,7 +76,7 @@ public:
     static void init(std::string dirname, int psz, int ksz, int pdl, int kdl);
     static void clear();
     void draw(glm::mat4 model, Camera camera);
-    static void DrawElem(Camera camera);
+    static void DrawElem(Camera camera, bool type);
     static void SwitchView(bool type);
    
 };

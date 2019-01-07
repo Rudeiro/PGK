@@ -15,6 +15,8 @@ GLint Mesh::pX;
 GLint Mesh::pY;
 GLint Mesh::siX;
 GLint Mesh::siY;
+int Mesh::szerokosc;
+int Mesh::dlugosc;
 
 GLint Mesh::pX_3D;
 GLint Mesh::pY_3D;
@@ -42,18 +44,17 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
 
 	mvp = glGetUniformLocation(programID_3D, "MVP");
     
-    pX_3D = glGetUniformLocation(programID_3D, "gridPosX");
-    pY_3D = glGetUniformLocation(programID_3D, "gridPosY");
-    siY_3D = glGetUniformLocation(programID_3D, "sizeY");
-    siX_3D = glGetUniformLocation(programID_3D, "sizeX");
-
-    glUniform1i(siX_3D, kdl - pdl);
-    glUniform1i(siY_3D, ksz - psz);
+    pX_3D = glGetUniformLocation(programID_3D, "dl");
+    pY_3D = glGetUniformLocation(programID_3D, "sz");
+    
+    szerokosc = ksz-1;
+    dlugosc = pdl;
+    
 
     programID = LoadShaders( "FlatView.vertexshader", "Terrain.fragmentshader" );
     glUseProgram(programID);
 
-	mvp = glGetUniformLocation(programID, "MVP");
+	//mvp = glGetUniformLocation(programID, "MVP");
     c = glGetUniformLocation(programID, "col");
     pX = glGetUniformLocation(programID, "gridPosX");
     pY = glGetUniformLocation(programID, "gridPosY");
@@ -63,7 +64,7 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
     glUniform1i(siX, kdl - pdl);
     glUniform1i(siY, ksz - psz);
 
-    Projection = glm::perspective(glm::radians(45.0f), (float) 4/ (float) 4, 0.1f, 100.0f);
+    Projection = glm::perspective(glm::radians(45.0f), (float) 4/ (float) 4, 0.1f, 1000.0f);
     glUniformMatrix4fv(p, 1, GL_FALSE, &Projection[0][0]);
 
      
@@ -166,7 +167,7 @@ void Mesh::draw(glm::mat4 model, Camera camera)
 }
 
 
-void Mesh::DrawElem(Camera camera)
+void Mesh::DrawElem(Camera camera, bool type)
 {
     glm:mat4 MVP = Projection*camera.View()*glm::mat4(1.0f);
     glUniformMatrix4fv(mvp, 1, GL_FALSE, &MVP[0][0]);
@@ -176,8 +177,17 @@ void Mesh::DrawElem(Camera camera)
     //glDrawArrays(GL_TRIANGLES, 0, 9);
     for(int i = 0; i < k; i++)
     {
-        glUniform1i(pX, GridPosX[i]);
-        glUniform1i(pY, -GridPosY[i]);
+        if(type)
+        {
+            glUniform1i(pX, GridPosX[i]);
+            glUniform1i(pY, -GridPosY[i]);
+        }
+        else
+        {
+            glUniform1i(pX_3D, GridPosX[i] + dlugosc);
+            glUniform1i(pY_3D, szerokosc - GridPosY[i]);
+        }
+        
         glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glDrawElements(GL_TRIANGLE_STRIP, 2403*1200, GL_UNSIGNED_INT, (void*)0);

@@ -28,7 +28,7 @@ using namespace glm;
 #include "DataReader.hpp"
 #include "Camera.hpp"
 bool view = true;
-Camera camera = Camera(glm::vec3(0, 0, 480), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+Camera camera = Camera(glm::vec3(0, 0, 637.1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if(key == GLFW_KEY_E)
@@ -36,8 +36,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         view = !view;
 		Mesh::SwitchView(view);
     }
-    else if(key == GLFW_KEY_F)
+    else if(key == GLFW_KEY_Z)
     {
+		camera.ChangeWorldPos(camera.GetWorldPos() + vec3(0, 0, 0.1));
+    }
+	else if(key == GLFW_KEY_X)
+    {
+		camera.ChangeWorldPos(camera.GetWorldPos() - vec3(0, 0, 0.1));
     }
 }
 
@@ -119,7 +124,7 @@ int main(int argc, char* argv[] )
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		
 		//triangle.draw(camera);
-		Mesh::DrawElem(camera);
+		Mesh::DrawElem(camera, view);
 
         frame = glfwGetTime();
         delta_time = -pre_frame + frame;

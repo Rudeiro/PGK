@@ -4,47 +4,31 @@
 layout(location = 0) in float vertex;
 
 
-uniform mat4 P;
-uniform mat4 V;
+
 uniform mat4 M;
 uniform mat4 MVP;
 
 /////////////positioning 
-uniform int sizeX;
-uniform int sizeY;
-uniform int gridPosX;
-uniform int gridPosY;
+uniform int dl;
+uniform int sz;
+
 
 out float ht;
 
 void main()
 {
-    float x;
-    float y; 
-    x = (gl_VertexID%1201)/600.0f;
-    y = gl_VertexID/1201;
-    y  = -y/600.0f;
-    x /= sizeX;
-    y /= sizeY;
+    /*x = r * cos(s) * sin(t)
+    y = r * sin(s) * sin(t)
+    z = r * cos(t)*/
+    float R = 637;
+    float x = R * sin(radians(90 - (gl_VertexID/1201.0f)/1200.0f)) * sin(radians((gl_VertexID%1201)/1200.0f));
+    float y = R * cos(radians(90 - (gl_VertexID/1201.0f)/1200.0f)); 
+    float z = R * cos(radians(90 - (gl_VertexID/1201.0f)/1200.0f)) * sin(radians((gl_VertexID%1201)/1200.0f));
+   
+   
     
-    if(sizeY < sizeX) y = y * sizeY/sizeX;
-    else x = x * sizeX/sizeY;
-    x -= 1;
-    y += 1;
-
-
-    if(sizeY < sizeX)
-    {
-        y += 2*gridPosY/(sizeY*1.0f)* sizeY/sizeX ;
-        x += 2*gridPosX/(sizeX*1.0f);
-    }
-    else
-    {
-        y += 2*gridPosY/(sizeY*1.0f);
-        x += 2*gridPosX/(sizeX*1.0f)* sizeX/sizeY;
-    }
-    //gl_Position = MVP * vec4(x, y, vertex ,1);
-    gl_Position =  vec4(x, y, 0 ,1);
+    gl_Position = MVP*vec4(x, y, z ,1);
+    
     ht = vertex;
 }
 
