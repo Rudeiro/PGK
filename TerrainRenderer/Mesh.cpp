@@ -33,7 +33,9 @@ GLfloat Mesh::vertex[100000] =
    -0.5f, 0.5f, 0.0f
 };
 GLfloat Mesh::map[4500000];
-GLuint Mesh::Order[4500000];
+GLuint Mesh::LOD[3][4500000];
+GLuint Mesh::LOD2[4500000];
+GLuint Mesh::LOD4[4500000];
 void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
 {
     glEnable(GL_DEPTH_TEST);
@@ -100,11 +102,33 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
     {
         for(int i = 0; i < 1201; i++)
         {
-            Order[2*i+k*2403] = i +1201*k;
+            LOD[0][2*i+k*2403] = i +1201*k;
 
-            Order[2*i+1 + k*2403] = i + 1201 + 1201*k;
+            LOD[0][2*i+1 + k*2403] = i + 1201 + 1201*k;
         }
-        Order[2403*(k+1) - 1] = 1500000;
+        LOD[0][2403*(k+1) - 1] = 1500000;
+    }
+
+    for(int k = 0; k < 1199; k += 2)
+    {
+        for(int i = 0; i < 1201; i += 2)
+        {
+            LOD[1][i+k*1203] = i +1201*k;
+
+            LOD[1][i+1 + k*1203] = i + 1201*2 + 1201*k;
+        }
+        LOD[1][1203*(k + 1) - 1] = 1500000;
+    }
+
+    for(int k = 0; k < 1199; k += 4)
+    {
+        for(int i = 0; i < 1201; i += 4)
+        {
+            LOD[2][i/2+k*603] = i +1201*k;
+
+            LOD[2][i/2+1 + k*603] = i + 1201*4 + 1201*k;
+        }
+        LOD[2][603*(k + 1) - 1] = 1500000;
     }
     //for(int i = 2402; i < 2410; i++) std::cout << Order[i] << std::endl;
     //for(int i = 0; i < 2402; i++) std::cout << Order[i] << std::endl;
@@ -119,8 +143,8 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
     //std::cout << heights[500] << std::endl;
     glGenBuffers(1, &orderbuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orderbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Order), Order, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orderbuffer);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Order), Order, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(LOD[1]), LOD[1], GL_STATIC_DRAW);
     
 
     glGenBuffers(1, &vertexbuffer);
@@ -136,6 +160,7 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
         0,                  // stride
         (void*)0            // array buffer offset
     );
+     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     /*glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
@@ -186,18 +211,24 @@ void Mesh::DrawElem(Camera camera, bool type)
         {
             glUniform1i(pX_3D, GridPosX[i] + dlugosc);
             glUniform1i(pY_3D, szerokosc - GridPosY[i]);
+            //std::cout << GridPosX[i] + dlugosc << " " << szerokosc - GridPosY[i] << std::endl;
         }
         
         glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+       
         glDrawElements(GL_TRIANGLE_STRIP, 2403*1200, GL_UNSIGNED_INT, (void*)0);
         //glDrawElements(GL_TRIANGLE_STRIP, 2403, GL_UNSIGNED_INT, (void*)0);
     }
-    //glDrawRangeElements(GL_TRIANGLE_STRIP, 2402, 4804, 2402, GL_UNSIGNED_INT, (void*)0);
+    
 }
 
 void Mesh::SwitchView(bool type)
 {
     if(type) glUseProgram(programID);
     else glUseProgram(programID_3D);
+}
+
+void Mesh::SwitchLOD(int lvl)
+{
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(LOD[lvl]), LOD[lvl], GL_STATIC_DRAW);
 }

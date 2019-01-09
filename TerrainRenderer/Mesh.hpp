@@ -48,7 +48,9 @@ protected:
     static GLint c;
     static GLfloat vertex[100000];
     static GLfloat map[4500000];
-    static GLuint Order[4500000];
+    static GLuint LOD[3][4500000];
+    static GLuint LOD2[4500000];
+    static GLuint LOD4[4500000];
     static GLuint orderbuffer;
     static GLuint vertexbuffer;
     static glm::mat4 Projection;
@@ -78,6 +80,7 @@ public:
     void draw(glm::mat4 model, Camera camera);
     static void DrawElem(Camera camera, bool type);
     static void SwitchView(bool type);
+    static void SwitchLOD(int lvl);
    
 };
 
