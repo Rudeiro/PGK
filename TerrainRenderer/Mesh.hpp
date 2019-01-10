@@ -51,7 +51,10 @@ protected:
     static GLuint LOD[3][4500000];
     static GLuint LOD2[4500000];
     static GLuint LOD4[4500000];
-    static GLuint orderbuffer;
+    static GLuint orderbuffer[4];
+    static GLuint orderbuffer2;
+    static GLuint orderbuffer4;
+    static GLuint orderbuffer_sizes;
     static GLuint vertexbuffer;
     static glm::mat4 Projection;
     static std::vector<std::vector<short>> heights;
@@ -67,6 +70,9 @@ protected:
     static std::vector<int> GridPosY;
     static int szerokosc;
     static int dlugosc;
+    static std::vector<GLuint> LODD;
+    static std::vector<GLuint> LOD_sizes;
+    static int lvl;
 
 public:
     Mesh(){};
@@ -80,7 +86,8 @@ public:
     void draw(glm::mat4 model, Camera camera);
     static void DrawElem(Camera camera, bool type);
     static void SwitchView(bool type);
-    static void SwitchLOD(int lvl);
+    static void SwitchLOD(int l);
+    static std::vector<GLuint> CreateLOD(int a);
    
 };
 

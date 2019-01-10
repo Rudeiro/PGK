@@ -27,9 +27,9 @@ using namespace glm;
 #include "GameObject.hpp"
 #include "DataReader.hpp"
 #include "Camera.hpp"
+#include "CameraControler.hpp"
 
-float  verticalAngle = 0.0f;
-float horizontalAngle = 3.14f;
+
 
 double lastMX;
 double lastMY;
@@ -43,15 +43,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         view = !view;
 		Mesh::SwitchView(view);
     }
-    else if(key == GLFW_KEY_Z)
-    {
-		camera.ChangeWorldPos(camera.GetWorldPos() + normalize(camera.GetWorldPos()));
-    }
-	else if(key == GLFW_KEY_X)
-    {
-		camera.ChangeWorldPos(camera.GetWorldPos() - normalize(camera.GetWorldPos()));
-    }
-	else if(key == GLFW_KEY_1)
+    else if(key == GLFW_KEY_1)
 	{
 		Mesh::SwitchLOD(0);
 	}
@@ -85,7 +77,7 @@ int main(int argc, char* argv[] )
 	 
     camera.ChangeWorldPos(vec3(x, y, z));
 	
-    GameObject triangle = GameObject(vec3(0, 0, 0), vec3(1, 1, 1), Mesh(vec3(1, 0, 0), 0, 9));
+    
     srand((unsigned)time(0));
 	//////////////////////////////////////////////////////////
     if( !glfwInit() )
@@ -149,46 +141,27 @@ int main(int argc, char* argv[] )
     pre_frame = frame - delta_time;
     Mesh::init(folder, psz, ksz, pdl, kdl);
 	std::vector<short> heights;
-	//heights = DataReader::ReadBinaryFile();
-	//for(int i = 0; i < heights.size(); i++) 
-		//std::cout << heights[i] << std::endl;
-	//std::cout << heights.size()<< std::endl;
+	
+	double lastTime = glfwGetTime();
+	int nbFrames = 0;
+	double currentTime;
     do{
         // Clear the screen
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		
 		//triangle.draw(camera);
 		Mesh::DrawElem(camera, view);
-
+		CameraControler::MoveCamera(window, camera, delta_time);
 		/////////////////////////
-		double mouseX;
-		double mouseY;
-		float mouseSpeed = 0.2f;
-		glfwGetCursorPos(window, &mouseX, &mouseY);
-
-		horizontalAngle += mouseSpeed * delta_time * float( lastMX - mouseX );
-		verticalAngle   += mouseSpeed * delta_time * float( lastMY - mouseY );
-
-		lastMX = mouseX;
-		lastMY = mouseY;
-
-		glm::vec3 direction = glm::vec3(
-			cos(verticalAngle) * sin(horizontalAngle),
-			sin(verticalAngle),
-			cos(verticalAngle) * cos(horizontalAngle)
-		);
-		glm::vec3 right = glm::vec3(
-			sin(horizontalAngle - 3.14f/2.0f),
-			0,
-			cos(horizontalAngle - 3.14f/2.0f)
-		);
-		glm::vec3 up = glm::cross( right, direction );
-
-
-		//camera.ChangeWorldPos(player.get_trans() - direction*Zoom);
-		camera.ChangeLookDir(camera.GetWorldPos() + direction);
-		camera.ChangeUpVec(up);
-
+		
+		currentTime = glfwGetTime();
+     	nbFrames++;
+     	if ( currentTime - lastTime >= 1.0 )
+		{ 
+			std::cout << nbFrames << " FPS" << std::endl;
+			nbFrames = 0;
+			lastTime += 1.0;
+     	}
 		/////////////////////////
 
 
