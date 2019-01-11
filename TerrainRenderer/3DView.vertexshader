@@ -22,7 +22,7 @@ void main()
     z = r * cos(t)*/
     float ln =  ((gl_VertexID % 1201) / 1200.0f) + dl;
     float lt = ((1201 - gl_VertexID / 1201) / 1200.0f) +sz;
-    float r = 63700 + (vertex/100.0f *2);
+    float r = 63700 + (vertex/100.0f);
 	float x = r*cos(radians(lt))*sin(radians(ln));
 	float y = r*sin(radians(lt));
     float z = r*cos(radians(lt))*cos(radians(ln));

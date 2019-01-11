@@ -168,13 +168,13 @@ void Mesh::draw(glm::mat4 model, Camera camera)
 }
 
 
-void Mesh::DrawElem(Camera camera, bool type)
+int Mesh::DrawElem(Camera camera, bool type)
 {
     glm:mat4 MVP = Projection*camera.View()*glm::mat4(1.0f);
     glUniformMatrix4fv(mvp, 1, GL_FALSE, &MVP[0][0]);
     
     int k = heights.size();
-
+    int vertices = 0;
     //glDrawArrays(GL_TRIANGLES, 0, 9);
     for(int i = 0; i < k; i++)
     {
@@ -191,11 +191,12 @@ void Mesh::DrawElem(Camera camera, bool type)
         }
         
         glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
-       
+
         glDrawElements(GL_TRIANGLE_STRIP, LOD_sizes[lvl], GL_UNSIGNED_INT, (void*)0);
-        //glDrawElements(GL_TRIANGLE_STRIP, 2403, GL_UNSIGNED_INT, (void*)0);
+        
+        vertices += LOD_sizes[lvl];
     }
-    
+    return vertices;
 }
 
 void Mesh::SwitchView(bool type)

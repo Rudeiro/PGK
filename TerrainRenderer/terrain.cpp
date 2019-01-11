@@ -74,7 +74,7 @@ int main(int argc, char* argv[] )
 	float y = (63800.0f)*sin(radians(psz*1.0f+ 1.0f));
     float z = (63800.0f)*cos(radians(psz*1.0f+ 1.0f))*cos(radians(1.0f*pdl+ 1.0f));
 	
-	 
+	CameraControler::ChangeLTLN((ksz + psz)/2.0f, (kdl + pdl)/2.0f, 100); 
     camera.ChangeWorldPos(vec3(x, y, z));
 	
     
@@ -124,7 +124,7 @@ int main(int argc, char* argv[] )
 
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -141,7 +141,7 @@ int main(int argc, char* argv[] )
     pre_frame = frame - delta_time;
     Mesh::init(folder, psz, ksz, pdl, kdl);
 	std::vector<short> heights;
-	
+	int vertices = 0;
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
 	double currentTime;
@@ -150,7 +150,7 @@ int main(int argc, char* argv[] )
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		
 		//triangle.draw(camera);
-		Mesh::DrawElem(camera, view);
+		vertices += Mesh::DrawElem(camera, view);
 		CameraControler::MoveCamera(window, camera, delta_time);
 		/////////////////////////
 		
@@ -158,7 +158,8 @@ int main(int argc, char* argv[] )
      	nbFrames++;
      	if ( currentTime - lastTime >= 1.0 )
 		{ 
-			std::cout << nbFrames << " FPS" << std::endl;
+			std::cout << nbFrames << " FPS\n" << vertices << std::endl;
+			vertices  = 0;
 			nbFrames = 0;
 			lastTime += 1.0;
      	}

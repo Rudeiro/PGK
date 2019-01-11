@@ -84,7 +84,7 @@ public:
     static void init(std::string dirname, int psz, int ksz, int pdl, int kdl);
     static void clear();
     void draw(glm::mat4 model, Camera camera);
-    static void DrawElem(Camera camera, bool type);
+    static int DrawElem(Camera camera, bool type);
     static void SwitchView(bool type);
     static void SwitchLOD(int l);
     static std::vector<GLuint> CreateLOD(int a);
