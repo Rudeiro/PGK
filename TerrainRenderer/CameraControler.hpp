@@ -43,10 +43,13 @@ protected:
     static float lt;
     static float ln;
     static float h;
+    static float zoom;
+    static float middleLT;
+    static float middleLN; 
     
 public:
     static void ChangeLTLN(float sz, float dl, float height);
-    static void MoveCamera(GLFWwindow* window, Camera &camera, float delta_time);
+    static void MoveCamera(GLFWwindow* window, Camera &camera, float delta_time, bool view);
 
 
 };

@@ -33,7 +33,8 @@ using namespace glm;
 
 double lastMX;
 double lastMY;
-
+bool aut = false;
+int autLvl = 2;
 bool view = true;
 Camera camera = Camera(glm::vec3(0, 0, 63700), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -46,14 +47,41 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     else if(key == GLFW_KEY_1)
 	{
 		Mesh::SwitchLOD(0);
+		aut = false;
+		autLvl = 0;
 	}
 	else if(key == GLFW_KEY_2)
 	{
 		Mesh::SwitchLOD(1);
+		aut = false;
+		autLvl = 1;
 	}
 	else if(key == GLFW_KEY_3)
 	{
 		Mesh::SwitchLOD(2);
+		
+		aut = false;
+		autLvl = 2;
+	}
+	else if(key == GLFW_KEY_4)
+	{
+		Mesh::SwitchLOD(3);
+		
+		aut = false;
+		autLvl = 3;
+	}
+	else if(key == GLFW_KEY_5)
+	{
+		Mesh::SwitchLOD(4);
+		
+		aut = false;
+		autLvl = 4;
+	}
+	else if(key == GLFW_KEY_0)
+	{
+		
+		aut = true;
+		
 	}
 }
 
@@ -150,8 +178,8 @@ int main(int argc, char* argv[] )
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		
 		//triangle.draw(camera);
-		vertices += Mesh::DrawElem(camera, view);
-		CameraControler::MoveCamera(window, camera, delta_time);
+		vertices += Mesh::DrawElem(camera, view, round(camera.getLTLN_POS()[0]), round(camera.getLTLN_POS()[1]));
+		CameraControler::MoveCamera(window, camera, delta_time, view);
 		/////////////////////////
 		
 		currentTime = glfwGetTime();
@@ -160,8 +188,26 @@ int main(int argc, char* argv[] )
 		{ 
 			std::cout << nbFrames << " FPS\n" << vertices << std::endl;
 			vertices  = 0;
-			nbFrames = 0;
+			
 			lastTime += 1.0;
+			if(aut && nbFrames >= 60 && autLvl > 0)
+			{
+				autLvl--;
+				
+				Mesh::SwitchLOD(autLvl);
+			}
+			else if(aut && nbFrames < 30 && autLvl < 4)
+			{
+				autLvl++;
+				
+				Mesh::SwitchLOD(autLvl);
+			}
+			std::cout << "LOD: " << autLvl << std::endl;
+			nbFrames = 0;
+			 
+				
+			
+
      	}
 		/////////////////////////
 

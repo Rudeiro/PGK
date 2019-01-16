@@ -34,6 +34,7 @@ private:
     vec3 WorldPos;
     vec3 LookDir;
     vec3 UpVec;
+    vec2 LTLN_POS;
 public:
 
     Camera(vec3 WorldPos, vec3 LookDir, vec3 UpVec)
@@ -47,6 +48,8 @@ public:
     void ChangeLookDir(vec3 NewLookDir);
     vec3 GetUpVec();
     void ChangeUpVec(vec3 NewUpVec);
+    void setLTLN_POS(float lt, float ln);
+    vec2 getLTLN_POS();
     glm::mat4 View();
 };
 

@@ -28,3 +28,13 @@ glm::mat4 Camera::View()
 {
     return glm::lookAt(WorldPos, LookDir, UpVec);
 }
+
+void Camera::setLTLN_POS(float lt, float ln)
+{
+    LTLN_POS = vec2(lt, ln);
+}
+
+vec2 Camera::getLTLN_POS()
+{
+    return LTLN_POS;
+}

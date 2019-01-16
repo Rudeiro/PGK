@@ -45,13 +45,13 @@ protected:
     static GLint v;
     static GLint p;
     static GLint mvp;
+    static GLint mvp2D;
     static GLint c;
     static GLfloat vertex[100000];
     static GLfloat map[4500000];
-    static GLuint LOD[3][4500000];
-    static GLuint LOD2[4500000];
-    static GLuint LOD4[4500000];
-    static GLuint orderbuffer[4];
+    
+    
+    static GLuint orderbuffer[6];
     static GLuint orderbuffer2;
     static GLuint orderbuffer4;
     static GLuint orderbuffer_sizes;
@@ -84,7 +84,7 @@ public:
     static void init(std::string dirname, int psz, int ksz, int pdl, int kdl);
     static void clear();
     void draw(glm::mat4 model, Camera camera);
-    static int DrawElem(Camera camera, bool type);
+    static int DrawElem(Camera camera, bool type, int s, int d);
     static void SwitchView(bool type);
     static void SwitchLOD(int l);
     static std::vector<GLuint> CreateLOD(int a);

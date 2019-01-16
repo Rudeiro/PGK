@@ -3,13 +3,14 @@
 GLuint Mesh::programID;
 GLuint Mesh::programID_3D;
 GLint Mesh::mvp;
+GLint Mesh::mvp2D;
 GLint Mesh::m;
 GLint Mesh::v;
 GLint Mesh::p;
 GLint Mesh::c;
 glm::mat4 Mesh::Projection;
 GLuint Mesh::vertexbuffer;
-GLuint Mesh::orderbuffer[4];
+GLuint Mesh::orderbuffer[6];
 GLuint Mesh::orderbuffer2;
 GLuint Mesh::orderbuffer4;
 
@@ -39,7 +40,7 @@ GLfloat Mesh::vertex[100000] =
 GLfloat Mesh::map[4500000];
 std::vector<GLuint> Mesh::LODD;
 std::vector<GLuint> Mesh::LOD_sizes;
-GLuint Mesh::LOD[3][4500000];
+
 std::vector<GLuint> Mesh::CreateLOD(int a)
 {
     std::vector<GLuint> LODD;
@@ -81,11 +82,12 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
     pY = glGetUniformLocation(programID, "gridPosY");
     siY = glGetUniformLocation(programID, "sizeY");
     siX = glGetUniformLocation(programID, "sizeX");
+    mvp2D = glGetUniformLocation(programID, "MVP");
 
     glUniform1i(siX, kdl - pdl);
     glUniform1i(siY, ksz - psz);
 
-    Projection = glm::perspective(glm::radians(45.0f), (float) 4/ (float) 4, 0.1f, 1000.0f);
+    Projection = glm::perspective(glm::radians(45.0f), (float) 4/ (float) 4, 0.1f, 10000.0f);
     glUniformMatrix4fv(p, 1, GL_FALSE, &Projection[0][0]);
 
      
@@ -98,14 +100,18 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
         while ((ent = readdir (dir)) != NULL) {
         
         std::string filename = ent->d_name;
+        
         int sz;
         int dl;
         if(filename.size() == 11)
         {
-            sz = std::stoi(filename.substr(1, 2));
-            dl = std::stoi(filename.substr(5, 3));
+            if(filename[0] == 'N') sz = std::stoi(filename.substr(1, 2));
+            else sz = -std::stoi(filename.substr(1, 2));
+            if(filename[3] == 'E') dl = std::stoi(filename.substr(4, 3));
+            else dl = -std::stoi(filename.substr(4, 3));
             if(sz >= psz && sz < ksz && dl >= pdl && dl < kdl)
             { 
+                std::cout << filename << std::endl;
                 heights.push_back(DataReader::ReadBinaryFile(dirname + filename));
                 GridPosX.push_back(dl - pdl);
                 GridPosY.push_back(-sz + ksz-1);
@@ -127,12 +133,24 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
     glGenBuffers(2, &orderbuffer[1]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orderbuffer[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*LODD.size(), &LODD[0], GL_STATIC_DRAW);
-    lvl = 2;
+    lvl = 3;
     LODD = CreateLOD(4);
     LOD_sizes.push_back(LODD.size());
     glGenBuffers(3, &orderbuffer[2]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orderbuffer[2]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*LODD.size(), &LODD[0], GL_STATIC_DRAW);
+
+    LODD = CreateLOD(8);
+    LOD_sizes.push_back(LODD.size());
+    glGenBuffers(4, &orderbuffer[3]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orderbuffer[3]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*LODD.size(), &LODD[0], GL_STATIC_DRAW);
+
+    /*LODD = CreateLOD(16);
+    LOD_sizes.push_back(LODD.size());
+    glGenBuffers(5, &orderbuffer[4]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, orderbuffer[4]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*LODD.size(), &LODD[0], GL_STATIC_DRAW);*/
     
 
     glGenBuffers(1, &vertexbuffer);
@@ -168,33 +186,42 @@ void Mesh::draw(glm::mat4 model, Camera camera)
 }
 
 
-int Mesh::DrawElem(Camera camera, bool type)
+int Mesh::DrawElem(Camera camera, bool type, int s, int d)
 {
     glm:mat4 MVP = Projection*camera.View()*glm::mat4(1.0f);
     glUniformMatrix4fv(mvp, 1, GL_FALSE, &MVP[0][0]);
-    
+    glUniformMatrix4fv(mvp2D, 1, GL_FALSE, &MVP[0][0]);
     int k = heights.size();
     int vertices = 0;
-    //glDrawArrays(GL_TRIANGLES, 0, 9);
+    int fragmentLT;
+    int fragmentLN;
+    
     for(int i = 0; i < k; i++)
     {
+        fragmentLT = szerokosc - GridPosY[i];
+        fragmentLN = GridPosX[i] + dlugosc;
         if(type)
         {
+            //std::cout << GridPosX[i] << " " << -GridPosY[i] << std::endl;
+            
             glUniform1i(pX, GridPosX[i]);
             glUniform1i(pY, -GridPosY[i]);
         }
         else
         {
-            glUniform1i(pX_3D, GridPosX[i] + dlugosc);
-            glUniform1i(pY_3D, szerokosc - GridPosY[i]);
+            glUniform1i(pX_3D, fragmentLN);
+            glUniform1i(pY_3D, fragmentLT);
             //std::cout << GridPosX[i] + dlugosc << " " << szerokosc - GridPosY[i] << std::endl;
         }
         
-        glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
-
-        glDrawElements(GL_TRIANGLE_STRIP, LOD_sizes[lvl], GL_UNSIGNED_INT, (void*)0);
         
-        vertices += LOD_sizes[lvl];
+        std::cout << s << " " << d << std::endl;
+        if(abs(fragmentLT - s) <= 1 && abs(fragmentLN - d) <= 1)
+        {
+            glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
+            glDrawElements(GL_TRIANGLE_STRIP, LOD_sizes[lvl], GL_UNSIGNED_INT, (void*)0);
+            vertices += LOD_sizes[lvl];
+        }
     }
     return vertices;
 }

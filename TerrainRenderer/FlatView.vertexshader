@@ -44,7 +44,7 @@ void main()
         x += 2*gridPosX/(sizeX*1.0f)* sizeX/sizeY;
     }
     //gl_Position = MVP * vec4(x, y, vertex ,1);
-    gl_Position =  vec4(x, y, 0 ,1);
+    gl_Position = MVP*vec4(x, y, 0 ,1);
     ht = vertex;
 }
 
