@@ -10,6 +10,8 @@ float CameraControler::middleLT;
 float CameraControler::middleLN;
 float CameraControler::h;
 float CameraControler::zoom = 1;
+float CameraControler::posX2D = 0;
+float CameraControler::posY2D = 0;
 
 void CameraControler::ChangeLTLN(float sz, float dl, float height)
 {
@@ -121,28 +123,30 @@ void CameraControler::MoveCamera(GLFWwindow* window, Camera &camera, float delta
         }
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            lt += 1*delta_time/3;
+            posY2D += delta_time;
+            //lt += 1*delta_time/3;
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            lt -= 1*delta_time/3;
-            
+            //lt -= 1*delta_time/3;
+            posY2D -= delta_time;
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            ln -= 1*delta_time/3;
-            
+            //ln -= 1*delta_time/3;
+            posX2D -= delta_time;
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
             
-            ln += 1*delta_time/3;
+            //ln += 1*delta_time/3;
+            posX2D += delta_time;
             
         }
-        //std::cout << round(lt) << " " << round(ln) << std::endl;
+       
         camera.setLTLN_POS(lt, ln);
-        camera.ChangeWorldPos(vec3((ln-middleLN), (lt-middleLT)*(2.0f/3), h/200.0f));
-        camera.ChangeLookDir(vec3((ln-middleLN), (lt-middleLT)*(2.0f/3), 0));
+        camera.ChangeWorldPos(vec3(posX2D, posY2D, h/200.0f));
+        camera.ChangeLookDir(vec3(posX2D, posY2D, 0));
         camera.ChangeUpVec(normalize(vec3(0, 1, 0)));
     }
 }

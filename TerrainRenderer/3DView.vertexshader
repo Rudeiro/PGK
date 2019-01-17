@@ -17,20 +17,14 @@ out float ht;
 
 void main()
 {
-    /*x = r * cos(s) * sin(t)
-    y = r * sin(s) * sin(t)
-    z = r * cos(t)*/
+    
     float ln =  ((gl_VertexID % 1201) / 1200.0f) + dl;
     float lt = ((1201 - gl_VertexID / 1201) / 1200.0f) +sz;
     float r = 63700 + (vertex/100.0f);
 	float x = r*cos(radians(lt))*sin(radians(ln));
 	float y = r*sin(radians(lt));
     float z = r*cos(radians(lt))*cos(radians(ln));
-    /*float R = 637;
-    float x = R * sin(radians(90 - (gl_VertexID/1201.0f)/1200.0f)) * sin(radians((gl_VertexID%1201)/1200.0f));
-    float y = R * cos(radians(90 - (gl_VertexID/1201.0f)/1200.0f)); 
-    float z = R * sin(radians(90 - (gl_VertexID/1201.0f)/1200.0f)) * cos(radians((gl_VertexID%1201)/1200.0f));
-   */
+    
    
     
     gl_Position = MVP*vec4(x, y, z ,1);

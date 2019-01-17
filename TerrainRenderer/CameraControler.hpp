@@ -45,7 +45,9 @@ protected:
     static float h;
     static float zoom;
     static float middleLT;
-    static float middleLN; 
+    static float middleLN;
+    static float posX2D;
+    static float posY2D; 
     
 public:
     static void ChangeLTLN(float sz, float dl, float height);

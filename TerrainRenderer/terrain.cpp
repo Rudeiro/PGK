@@ -94,10 +94,10 @@ int main(int argc, char* argv[] )
 {
 	
 	std::string folder = argv[1];
-	int psz = std::stoi(argv[2]);
-	int ksz = std::stoi(argv[3]);
-	int pdl = std::stoi(argv[4]);
-	int kdl = std::stoi(argv[5]);
+	int psz = std::stoi(argv[3]);
+	int ksz = std::stoi(argv[4]);
+	int pdl = std::stoi(argv[6]);
+	int kdl = std::stoi(argv[7]);
 	float x = (63800.0f)*cos(radians(psz*1.0f + 1.0f))*sin(radians(1.0f*pdl+ 1.0f));
 	float y = (63800.0f)*sin(radians(psz*1.0f+ 1.0f));
     float z = (63800.0f)*cos(radians(psz*1.0f+ 1.0f))*cos(radians(1.0f*pdl+ 1.0f));

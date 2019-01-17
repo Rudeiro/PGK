@@ -95,7 +95,8 @@ void Mesh::init(std::string dirname, int psz, int ksz, int pdl, int kdl)
     //std::string path = "/home/konrad/repositories/PGK/TerrainRenderer/maps";
     DIR *dir;
     struct dirent *ent;
-    if ((dir = opendir ("/home/konrad/repositories/PGK/TerrainRenderer/maps")) != NULL) {
+    std::string d = "./" + dirname;
+    if ((dir = opendir (d.c_str())) != NULL) {
         /* print all the files and directories within directory */
         while ((ent = readdir (dir)) != NULL) {
         
@@ -215,8 +216,8 @@ int Mesh::DrawElem(Camera camera, bool type, int s, int d)
         }
         
         
-        std::cout << s << " " << d << std::endl;
-        if(abs(fragmentLT - s) <= 1 && abs(fragmentLN - d) <= 1)
+        //std::cout << s << " " << d << std::endl;
+        if(abs(fragmentLT - s) <= 3 && abs(fragmentLN - d) <= 3)
         {
             glBufferData(GL_ARRAY_BUFFER, sizeof(short)*heights[i].size(), &heights[i][0], GL_STATIC_DRAW);
             glDrawElements(GL_TRIANGLE_STRIP, LOD_sizes[lvl], GL_UNSIGNED_INT, (void*)0);
