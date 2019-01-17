@@ -196,7 +196,7 @@ int main(int argc, char* argv[] )
 				
 				Mesh::SwitchLOD(autLvl);
 			}
-			else if(aut && nbFrames < 30 && autLvl < 4)
+			else if(aut && nbFrames < 30 && autLvl < 3)
 			{
 				autLvl++;
 				

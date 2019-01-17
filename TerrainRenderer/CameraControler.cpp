@@ -124,22 +124,22 @@ void CameraControler::MoveCamera(GLFWwindow* window, Camera &camera, float delta
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
             posY2D += delta_time;
-            //lt += 1*delta_time/3;
+            lt += 1*delta_time/3;
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            //lt -= 1*delta_time/3;
+            lt -= 1*delta_time/3;
             posY2D -= delta_time;
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            //ln -= 1*delta_time/3;
+            ln -= 1*delta_time/3;
             posX2D -= delta_time;
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
             
-            //ln += 1*delta_time/3;
+            ln += 1*delta_time/3;
             posX2D += delta_time;
             
         }
